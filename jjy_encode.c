@@ -1,6 +1,11 @@
 #include "jjy_encode.h"
 #include <stdio.h>
+
+#define _USE_MATH_DEFINES
 #include <math.h>
+
+#define FREQ 20000
+#define RATE 192000
 
 int jjy_encode(struct tm *t, char out[60])
 {
@@ -294,31 +299,31 @@ int jjy_encode_now(char out[60])
     return 0;
 }
 
-int jjy_bit_to_pcm(char bit, unsigned short pcm[192000])
+int jjy_bit_to_pcm(char bit, unsigned short pcm[RATE])
 {
-    for (int i = 0; i < 192000; i++)
+    for (int i = 0; i < RATE; i++)
     {
-        pcm[i] = 0.2 * (cos(M_PI * i / 192000 * 20000) + 0) * 32768;
+        pcm[i] = 0.2 * (cos(2 * M_PI * i / RATE * FREQ) + 0) * 32768;
     }
     if (bit == '0')
     {
-        for (int i = 192000 * 0.8; i < 192000; i++)
+        for (int i = RATE * 0.8; i < RATE; i++)
         {
-            pcm[i] = 0.01 * (cos(M_PI * i / 192000 * 20000) + 0) * 32768;
+            pcm[i] = 0.01 * (cos(M_PI * i / RATE * FREQ) + 0) * 32768;
         }
     }
     else if (bit == '1')
     {
-        for (int i = 192000 * 0.5; i < 192000; i++)
+        for (int i = RATE * 0.5; i < RATE; i++)
         {
-            pcm[i] = 0.01 * (cos(M_PI * i / 192000 * 20000) + 0) * 32768;
+            pcm[i] = 0.01 * (cos(M_PI * i / RATE * FREQ) + 0) * 32768;
         }
     }
     else if (bit == 'm')
     {
-        for (int i = 192000 * 0.2; i < 192000; i++)
+        for (int i = RATE * 0.2; i < RATE; i++)
         {
-            pcm[i] = 0.01 * (cos(M_PI * i / 192000 * 20000) + 0) * 32768;
+            pcm[i] = 0.01 * (cos(M_PI * i / RATE * FREQ) + 0) * 32768;
         }
     }
 
@@ -328,7 +333,7 @@ int jjy_encode_to_pcm(char out[60], unsigned short* pcm)
 {
     for (int i = 0; i < 60; i++)
     {
-        jjy_bit_to_pcm(out[i], pcm + i * 192000);
+        jjy_bit_to_pcm(out[i], pcm + i * RATE);
     }
 
     return 0;
