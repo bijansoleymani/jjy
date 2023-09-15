@@ -1,5 +1,5 @@
 jjy.exe: main.c jjy_encode.o jjy_decode.o
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ -lm
 
 jjy_encode.o: jjy_encode.c jjy_encode.h
 	$(CC) $(CFLAGS) -c $<

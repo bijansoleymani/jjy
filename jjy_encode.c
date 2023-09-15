@@ -1,5 +1,6 @@
 #include "jjy_encode.h"
 #include <stdio.h>
+#include <math.h>
 
 int jjy_encode(struct tm *t, char out[60])
 {
@@ -79,7 +80,7 @@ int jjy_encode(struct tm *t, char out[60])
     } else {
         out[8] = '0';
     }
-    printf("%d\n", min);
+    //printf("%d\n", min);
     assert(min == 0);
 
     int hours = t->tm_hour;
@@ -121,7 +122,7 @@ int jjy_encode(struct tm *t, char out[60])
     }
     assert(hours == 0);
 
-    int day = t->tm_yday;
+    int day = t->tm_yday + 1;
     if (day >= 200) {
         out[22] = '1';
         day -= 200;
@@ -290,5 +291,45 @@ int jjy_encode_now(char out[60])
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
     jjy_encode(&tm, out);
+    return 0;
+}
+
+int jjy_bit_to_pcm(char bit, unsigned short pcm[192000])
+{
+    for (int i = 0; i < 192000; i++)
+    {
+        pcm[i] = 0.2 * (cos(M_PI * i / 192000 * 20000) + 0) * 32768;
+    }
+    if (bit == '0')
+    {
+        for (int i = 192000 * 0.8; i < 192000; i++)
+        {
+            pcm[i] = 0.01 * (cos(M_PI * i / 192000 * 20000) + 0) * 32768;
+        }
+    }
+    else if (bit == '1')
+    {
+        for (int i = 192000 * 0.5; i < 192000; i++)
+        {
+            pcm[i] = 0.01 * (cos(M_PI * i / 192000 * 20000) + 0) * 32768;
+        }
+    }
+    else if (bit == 'm')
+    {
+        for (int i = 192000 * 0.2; i < 192000; i++)
+        {
+            pcm[i] = 0.01 * (cos(M_PI * i / 192000 * 20000) + 0) * 32768;
+        }
+    }
+
+    return 0;
+}
+int jjy_encode_to_pcm(char out[60], unsigned short* pcm)
+{
+    for (int i = 0; i < 60; i++)
+    {
+        jjy_bit_to_pcm(out[i], pcm + i * 192000);
+    }
+
     return 0;
 }

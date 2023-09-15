@@ -7,6 +7,7 @@ int jjy_decode(const char in[60], struct tm* t)
 {
     for (int i = 0; i < 60; i++) {
         printf("%d: %c\n", i, in[i]);
+        assert(in[i] == '0' || in[i] == '1' || in[i] == 'm');
         assert(in[i] != 0);
     }
     int year = 0;
